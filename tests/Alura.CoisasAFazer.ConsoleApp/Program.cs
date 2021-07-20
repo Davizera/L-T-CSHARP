@@ -19,16 +19,7 @@ namespace Alura.CoisasAFazer.ConsoleApp
             //- abdicando da responsabilidade de criar o objeto, mas mantendo a dependência;  construtor com argumentos informando quais objetos são necessários
             //- já que precisamos passar uma implementação podemos criar nossas próprias classes mais baratas e rápidas!
 
-            var comando = new CadastraTarefa("Estudar Xunit", new Core.Models.Categoria("Estudo"), new DateTime(2019, 12, 31));
-            var repo = new RepoFakeTarefas();
-            var handler = new CadastraTarefaHandler(repo, null);
-
-            handler.Execute(comando);
-
-            foreach (var tarefa in repo.ObtemTarefas(t => t.Categoria.Descricao == "Estudo"))
-            {
-                Console.WriteLine(tarefa);
-            }
+          
         }
     }
 }
