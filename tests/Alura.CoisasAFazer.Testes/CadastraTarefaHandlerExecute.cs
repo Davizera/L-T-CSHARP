@@ -4,7 +4,9 @@ using System.Text;
 using Alura.CoisasAFazer.Core.Commands;
 using Alura.CoisasAFazer.Core.Models;
 using Alura.CoisasAFazer.Services.Handlers;
+using Alura.CoisasAFazer.Testes.TestDubles;
 using Xunit;
+using System.Linq;
 
 namespace Alura.CoisasAFazer.Testes
 {
@@ -15,30 +17,15 @@ namespace Alura.CoisasAFazer.Testes
 		{
 			//arrange
 			var comando = new CadastraTarefa("Estudar xUnit", new Categoria("Estudo"), DateTime.Now);
-			var handler = new Services.Handlers.CadastraTarefaHandler();
+			var fakeRepo = new RepoFakeTarefas();
+			var handler = new CadastraTarefaHandler(fakeRepo);
 
 			//act
 			handler.Execute(comando);
 
 			//assert
-			Assert.True(true);
-		}
-
-		[Fact]
-		public void PassingTest()
-		{
-			Assert.Equal(4, Add(2, 2));
-		}
-
-		[Fact]
-		public void FailingTest()
-		{
-			Assert.Equal(5, Add(2, 2));
-		}
-
-		public int Add(int x, int y)
-		{
-			return x + y;
+			var tarefa = fakeRepo.ObtemTarefa((t) => t.Titulo == "Estudar xUnit");
+			Assert.NotNull(tarefa);
 		}
 	}
 }
