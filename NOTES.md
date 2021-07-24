@@ -2,6 +2,8 @@
 
 > Aqui seguirão anotações de conceitos aprendidos no curso.
 
+## Aula 1 - Testes de integração
+
 ### System under test (SUT)
 Termo usado para se referir à parte do sistema que está sendo testada, sendo ele um método/classe, entre outros.
 
@@ -111,4 +113,14 @@ public CadastraTarefaHandler(IRepositorioTarefas repositorio)
         }
 
 ```
+
+## Aula 2 - Dependências mais leve e mais rápidas
+
+### InMemoryDatabase
+
+Para mais informações sobre abordagem desse problema visitie o [Testando com o EF In-Memory Database](https://docs.microsoft.com/en-us/ef/core/testing/in-memory).
+
+>[!WARNING]
+> Caso o teste do banco de dados seja relevante o pior modo de testar é usando o InMemoryDatabase, você pode contornar isso através do uso do SQLite, por exemplo.
+
 
