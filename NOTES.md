@@ -168,7 +168,9 @@ Aqui vimos o caso em que a gente precisa preencher o banco com uma "grande" quan
 > Isso foi citado anteriormente na seção que fala sobre o [InMemoryDatabse](#InMemoryDatabase) em si. 
 
 Tipos de dublês: 
-1. Dummy Object (objetos sem uso)
-   2. 
+1. Dummy Object (objetos sem uso)  
+	O dummy object é como próprio nome diz, burro. Esse objeto não tem utilizada alguma para gente a não ser preencher algo que é obrigatório para que o teste não quebre (isso porque esse não está sendo o foco do teste no momento).
 2. Fake Object (objeto criado para simular determinado comportamento)
+	O fake object já é algo mais complicado, dependendo é claro do objeto que você esteja tentando simular. Um exemplo de implementação do fake object foi o repositorio que criamos só para imitar alguns comportamentos implementados pelo repositório verdadeiro. Em alguns casos não deve valer a pena utilizar esse tipo de dublê por ser algum objeto/entidade muito complexa, nesse caso provavelmente o ideal será recorrer ao próximo tópico.
 3. InMemoryDatabase
+	Por eliminação esse dublê é o ideal para quando não se vale a pena tentar criar um fake object ou até mesmo fazer uso do dummy object (mas pode ser que mesmo com esse dublê você faça uso do dummy), esse tipo de dublê é interassante por permitir você fazer uso do recurs
