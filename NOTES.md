@@ -131,15 +131,15 @@ Veja abaixo o trecho de código que mostra a mudança do código:
 //Antes da mudança, a classe criava o contexto independentemente.
 //Assim ficamos engessados, dificultando os testes e flexibilidade da classe.
 public RepositorioTarefa()
-		{
-			_ctx = new DbTarefasContext ();
-		}
+	{
+		_ctx = new DbTarefasContext ();
+	}
 //Após mudança, classe mais flexível e mais testável. 
 //Agora quem tem o controle é quem faz o uso dessa classe.
 public RepositorioTarefa(DbTarefasContext dbTarefasContext)
-		{
-			_ctx = dbTarefasContext;
-		}
+	{
+		_ctx = dbTarefasContext;
+	}
 ```
 
 Com essa mudança, foi necessário fazer algumas adaptações para usar o `InMemoryDatabase` em nossa classe que realiza os testes.
@@ -161,15 +161,14 @@ var handler = new CadastraTarefaHandler(repo);
 
 ## Massa de dados
 
-Aqui vimos o caso em que a gente precisa preencher o banco com uma "grande" quantidade de dados, mas para fazer isso num banco de teste ou um banco em que vários devs usam pode ser problemático, mas por quê? Isso porque há a grande chance de a base ser alterada diversas vezes entre os teste e consequentemente te atrapalhando, sendo assim, para que isso não ocorrra a gente faz o uso o InMemoryDatabase para poder simular esse comportamento.
+Aqui vimos o caso em que a gente precisa preencher o banco com uma "grande" quantidade de dados, mas para fazer isso num banco de teste ou um banco em que vários devs usam pode ser problemático, mas por quê? Isso porque há a grande chance de a base ser alterada diversas vezes entre os teste e, consequentemente te atrapalhando. Sendo assim, para que isso não ocorrra a gente faz o uso o InMemoryDatabase para poder simular esse comportamento, criando o contexto e afins.
 
 > [!WARNING]
 > Lembrando que o InMemoryDatabase não é recomendado para fazer teste do banco de dados em sim, ele é recomendado para quando o tipo/banco de dados **não importa!**
 > Isso foi citado anteriormente na seção que fala sobre o [InMemoryDatabse](#InMemoryDatabase) em si. 
 
-Adicição de dados para não ficar dependente do banco de dados.
-
 Tipos de dublês: 
 1. Dummy Object (objetos sem uso)
+   2. 
 2. Fake Object (objeto criado para simular determinado comportamento)
 3. InMemoryDatabase
