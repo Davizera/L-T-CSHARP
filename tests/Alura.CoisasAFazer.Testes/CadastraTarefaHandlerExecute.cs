@@ -7,6 +7,8 @@ using Alura.CoisasAFazer.Services.Handlers;
 using Alura.CoisasAFazer.Testes.TestDubles;
 using Xunit;
 using System.Linq;
+using Alura.CoisasAFazer.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace Alura.CoisasAFazer.Testes
 {
@@ -17,14 +19,20 @@ namespace Alura.CoisasAFazer.Testes
 		{
 			//arrange
 			var comando = new CadastraTarefa("Estudar xUnit", new Categoria("Estudo"), DateTime.Now);
-			var fakeRepo = new RepoFakeTarefas();
-			var handler = new CadastraTarefaHandler(fakeRepo);
+			
+			var options = new DbContextOptionsBuilder<DbTarefasContext>()
+				.UseInMemoryDatabase("DbTarefas")
+				.Options;
+			var context = new DbTarefasContext(options);
+			var repo = new RepositorioTarefa(context);
+			
+			var handler = new CadastraTarefaHandler(repo);
 
 			//act
 			handler.Execute(comando);
 
 			//assert
-			var tarefa = fakeRepo.ObtemTarefa((t) => t.Titulo == "Estudar xUnit");
+			var tarefa = repo.ObtemTarefa((t) => t.Titulo == "Estudar xUnit");
 			Assert.NotNull(tarefa);
 		}
 	}

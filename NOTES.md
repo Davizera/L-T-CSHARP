@@ -120,7 +120,56 @@ public CadastraTarefaHandler(IRepositorioTarefas repositorio)
 
 Para mais informações sobre abordagem desse problema visitie o [Testando com o EF In-Memory Database](https://docs.microsoft.com/en-us/ef/core/testing/in-memory).
 
->[!WARNING]  
+> [!WARNING]  
 > Caso o teste do banco de dados seja relevante o pior modo de testar é usando o InMemoryDatabase, você pode contornar isso através do uso do SQLite, por exemplo.
 
+Nesta aula aprendendo um pouco sobre como trabalhar fazendo uso da abordagem InMemoryDatabase, para substituir o uso do banco de dados. Um dos pontos positivos de usar essa abordagem é a facilidade de sua implementação já que não precisamos clonar o comportamento de algo como fizemos na aula anterior, [Aula - 1](#aula-1---testes-de-integração).  
+Para isso, a gente precisou refatorar alguns trecos de código. Novamente fizemos a inversãod e controle, mas agora no `RepositorioTarefas` para que ao invés da própria classe criar o `Contexto`, esse foi injetado nela, sendo assim, fica claro para quem quiser utilizar essa determinada que para usá-la se faz necessário a injeção dessa determinada dependência.  
+Veja abaixo o trecho de código que mostra a mudança do código:
+```csharp
 
+//Antes da mudança, a classe criava o contexto independentemente.
+//Assim ficamos engessados, dificultando os testes e flexibilidade da classe.
+public RepositorioTarefa()
+		{
+			_ctx = new DbTarefasContext ();
+		}
+//Após mudança, classe mais flexível e mais testável. 
+//Agora quem tem o controle é quem faz o uso dessa classe.
+public RepositorioTarefa(DbTarefasContext dbTarefasContext)
+		{
+			_ctx = dbTarefasContext;
+		}
+```
+
+Com essa mudança, foi necessário fazer algumas adaptações para usar o `InMemoryDatabase` em nossa classe que realiza os testes.
+Primeiro a gente teve que criar um objeto que define as configurações que serão usados pelo nosso contexto, nessas configurações a gente consegue definir o uso do `InMemoryDatabase` e passamos essas configurações a diante para a classe que do nosso contexto, o `DbContextTarefas`, para ai sim criarmos uma instância para o nosso repositório as coisas criados à nossa maneira, já que no invertemos o controle de como as coisas eram criadas.
+Segue abaixo o trecho de código que define as configurações:
+```csharp
+//Criar o objeto que define as configurações para usarmos no nosso Context.
+var options = new DbContextOptionsBuilder<DbTarefasContext>()
+				.UseInMemoryDatabase("DbTarefas")
+				.Options;
+//Cria o Context com a configurações que definimos.
+var context = new DbTarefasContext(options);
+
+//Cria o repositório com o Context que criarmos configurado à nossa maneira.
+var repo = new RepositorioTarefa(context);
+			
+var handler = new CadastraTarefaHandler(repo);
+```
+
+## Massa de dados
+
+Aqui vimos o caso em que a gente precisa preencher o banco com uma "grande" quantidade de dados, mas para fazer isso num banco de teste ou um banco em que vários devs usam pode ser problemático, mas por quê? Isso porque há a grande chance de a base ser alterada diversas vezes entre os teste e consequentemente te atrapalhando, sendo assim, para que isso não ocorrra a gente faz o uso o InMemoryDatabase para poder simular esse comportamento.
+
+> [!WARNING]
+> Lembrando que o InMemoryDatabase não é recomendado para fazer teste do banco de dados em sim, ele é recomendado para quando o tipo/banco de dados **não importa!**
+> Isso foi citado anteriormente na seção que fala sobre o [InMemoryDatabse](#InMemoryDatabase) em si. 
+
+Adicição de dados para não ficar dependente do banco de dados.
+
+Tipos de dublês: 
+1. Dummy Object (objetos sem uso)
+2. Fake Object (objeto criado para simular determinado comportamento)
+3. InMemoryDatabase

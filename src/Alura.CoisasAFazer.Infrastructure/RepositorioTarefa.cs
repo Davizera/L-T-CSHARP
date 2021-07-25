@@ -9,9 +9,9 @@ namespace Alura.CoisasAFazer.Infrastructure
 	{
 		DbTarefasContext _ctx;
 
-		public RepositorioTarefa()
+		public RepositorioTarefa(DbTarefasContext dbTarefasContext)
 		{
-			_ctx = new DbTarefasContext();
+			_ctx = dbTarefasContext;
 		}
 
 		public void AtualizarTarefas(params Tarefa[] tarefas)
@@ -40,6 +40,11 @@ namespace Alura.CoisasAFazer.Infrastructure
 		public IEnumerable<Tarefa> ObtemTarefas(Func<Tarefa, bool> filtro)
 		{
 			return _ctx.Tarefas.Where(filtro);
+		}
+
+		public Tarefa ObtemTarefa(Func<Tarefa, bool> filtro)
+		{
+			return _ctx.Tarefas.Where(filtro).FirstOrDefault();
 		}
 	}
 }
