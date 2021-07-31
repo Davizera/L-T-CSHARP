@@ -159,7 +159,7 @@ var repo = new RepositorioTarefa(context);
 var handler = new CadastraTarefaHandler(repo);
 ```
 
-## Massa de dados
+### Massa de dados
 
 Aqui vimos o caso em que a gente precisa preencher o banco com uma "grande" quantidade de dados, mas para fazer isso num banco de teste ou um banco em que vários devs usam pode ser problemático, mas por quê? Isso porque há a grande chance de a base ser alterada diversas vezes entre os teste e, consequentemente te atrapalhando. Sendo assim, para que isso não ocorrra a gente faz o uso o InMemoryDatabase para poder simular esse comportamento, criando o contexto e afins.
 
@@ -167,10 +167,63 @@ Aqui vimos o caso em que a gente precisa preencher o banco com uma "grande" quan
 > Lembrando que o InMemoryDatabase não é recomendado para fazer teste do banco de dados em sim, ele é recomendado para quando o tipo/banco de dados **não importa!**
 > Isso foi citado anteriormente na seção que fala sobre o [InMemoryDatabse](#InMemoryDatabase) em si. 
 
-Tipos de dublês: 
+#### Referências:
+https://jimmybogard.com/avoid-in-memory-databases-for-tests/
+
+## Aula 3 - Injetando dados para cenários complexos
+
+Em alguns casos a gente precisa injetar/definir alguns comportamentos e sem mudar as partes do código de produção. Nessa aula aprendemos como definir que uma exceção seja lançada durante a execução de um determinado método. Para facilitar esse processo fizemos o uso do framework Moq para definir essas configurações.
+Uma maneira de definir que uma execeção seja lançada durante um determinado método segue no trecho de código abaixo:
+
+```csharp
+//Cria um mock do objeto que queremos
+var mock = new Mock<IRepositorioTarefas>();
+//Faz o setup do comportamento que queremos
+//Aqui a gente definiu que para qualquer array de Tarefa uma execeção deve ser lançada
+mock.Setup(r => r.IncluirTarefas(It.IsAny<Tarefa[]>()))
+	.Throws(new Exception("Houve um erro ao tentar incluir tarefa(s)"));
+var repo = mock.Object;
+
+```
+
+Aqui a gente está lindando com o tipo de dublê chamado **stub**, veja mais no listagem dos [tipos de dublê](#tipos-de-duble)
+
+#### Referências:
+https://documentation.help/
+https://martinfowler.com/bliki/TestDouble.html
+https://blog.pragmatists.com/test-doubles-fakes-mocks-and-stubs-1a7491dfa3da
+
+## Aula 4 - Testando o comportamento do seu sistema
+
+Em determinados momentos dos nossos teste no iremos querer saber se um determinado foi chamada, se ele foi chamado o tanto de vezes que deveria e coisas semelhantes, mas não podemos apelar para o bom e velho Console.WriteLine para ficar nos informando determinado foi chamado ou não né? Afinal, o código em um certo momento irá para o ambiente de produção e nele queremos o código com absolutamente mais nada além do necessário.  
+Para esse cenário a gente pode fazer uso novamente da biblioteca de teste Moq, configurando o nosso código da seguinte maneira:
+
+```csharp
+//Código que não importa...
+//Definimos o mock do objeto que queremos usar
+var mock = new Mock<IRepositorioTarefas>();
+//Aqui configuramos, para qualquer chamada para o ObtemTarefas ele retorne uma lista predefinida de tarefas
+mock.Setup(r => r.ObtemTarefas(It.IsAny<Func<Tarefa, bool>>()))
+	.Returns(tarefas);
+//Código que não importa...
+//Aqui colocamos a verificação que queremos, e nela procuramos sabe se houve apenas uma chamada  
+//ao método AtualizarTarefas para qualquer array de tarefas
+mock.Verify(r => r.AtualizarTarefas(It.IsAny<Tarefa[]>()), Times.Once());
+```
+
+Nessa aula a gente aprendeu sobre o dublê chamado mock, na [listagem dos dublês](#tipos-de-dubles) tem uma explicação de como ele é usado e em quais cenários.
+
+## Aula 5 - Verificando efeitos colaterais
+
+
+
+
+## Tipos de dublês: 
 1. Dummy Object (objetos sem uso)  
 	O dummy object é como próprio nome diz, burro. Esse objeto não tem utilizada alguma para gente a não ser preencher algo que é obrigatório para que o teste não quebre (isso porque esse não está sendo o foco do teste no momento).
 2. Fake Object (objeto criado para simular determinado comportamento)
 	O fake object já é algo mais complicado, dependendo é claro do objeto que você esteja tentando simular. Um exemplo de implementação do fake object foi o repositorio que criamos só para imitar alguns comportamentos implementados pelo repositório verdadeiro. Em alguns casos não deve valer a pena utilizar esse tipo de dublê por ser algum objeto/entidade muito complexa, nesse caso provavelmente o ideal será recorrer ao próximo tópico.
 3. InMemoryDatabase
-	Por eliminação esse dublê é o ideal para quando não se vale a pena tentar criar um fake object ou até mesmo fazer uso do dummy object (mas pode ser que mesmo com esse dublê você faça uso do dummy), esse tipo de dublê é interassante por permitir você fazer uso do recurs
+	Por eliminação esse dublê é o ideal para quando não se vale a pena tentar criar um fake object ou até mesmo fazer uso do dummy object (mas pode ser que mesmo com esse dublê você faça uso do dummy), esse tipo de dublê é interassante por facilitar o seu trabalho na hora de testar, mas se lembre o diabo mora nos detalhes!
+4. Stub, que é um objeto que guarda dados predefinios e usa isso para responder as chamadas durante o teste. Ele é muito usando quando a gente não pode ou não quer envolver objetos que irão responder com dados reais podendo causas efeitos não desejados na nossa base de dados, entre outros.  
+5. Mocks, são objetos que registram as chamadas que eles recebem. Quando estamos testando algo são os mock que nos ajudam a saber de uma deteminado método foi executado ou não. Ele pode ser usado para verificar se um método que envia emails foi chamado, entre outre outras coisas.

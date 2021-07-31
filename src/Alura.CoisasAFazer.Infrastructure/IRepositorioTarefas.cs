@@ -11,6 +11,6 @@ namespace Alura.CoisasAFazer.Infrastructure
         void ExcluirTarefas(params Tarefa[] tarefas);
 
         Categoria ObtemCategoriaPorId(int id);
-        IEnumerable<Tarefa> ObtemTarefas(Func<Tarefa, bool> filtro);
+        IEnumerable<Tarefa> ObtemTarefas(Func<Tarefa, bool> filtro = null);
     }
 }

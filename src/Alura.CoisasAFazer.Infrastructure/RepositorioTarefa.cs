@@ -37,8 +37,9 @@ namespace Alura.CoisasAFazer.Infrastructure
 			return _ctx.Categorias.FirstOrDefault(c => c.Id == id);
 		}
 
-		public IEnumerable<Tarefa> ObtemTarefas(Func<Tarefa, bool> filtro)
+		public IEnumerable<Tarefa> ObtemTarefas(Func<Tarefa, bool> filtro = null)
 		{
+			if (filtro == null) return _ctx.Tarefas;
 			return _ctx.Tarefas.Where(filtro);
 		}
 

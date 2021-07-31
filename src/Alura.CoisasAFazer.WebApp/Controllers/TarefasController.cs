@@ -2,27 +2,38 @@
 using Alura.CoisasAFazer.WebApp.Models;
 using Alura.CoisasAFazer.Core.Commands;
 using Alura.CoisasAFazer.Services.Handlers;
+using Alura.CoisasAFazer.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Alura.CoisasAFazer.WebApp.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TarefasController : ControllerBase
-    {
-        [HttpPost]
-        public IActionResult EndpointCadastraTarefa(CadastraTarefaVM model)
-        {
-            var cmdObtemCateg = new ObtemCategoriaPorId(model.IdCategoria);
-            var categoria = new ObtemCategoriaPorIdHandler().Execute(cmdObtemCateg);
-            if (categoria == null)
-            {
-                return NotFound("Categoria não encontrada");
-            }
+	[Route("api/[controller]")]
+	[ApiController]
+	public class TarefasController : ControllerBase
+	{
+		private IRepositorioTarefas _repositorioTarefas;
+		private ILogger<CadastraTarefaHandler> _logger;
 
-            var comando = new CadastraTarefa(model.Titulo, categoria, model.Prazo);
-            var handler = new CadastraTarefaHandler();
-            handler.Execute(comando);
-            return Ok();
-        }
-    }
+		public TarefasController(IRepositorioTarefas repositorio, ILogger<CadastraTarefaHandler> logger)
+		{
+			_repositorioTarefas = repositorio;
+			_logger = logger;
+		}
+
+		[HttpPost]
+		public IActionResult EndpointCadastraTarefa(CadastraTarefaVM model)
+		{
+			var cmdObtemCateg = new ObtemCategoriaPorId(model.IdCategoria);
+			var categoria = new ObtemCategoriaPorIdHandler(_repositorioTarefas).Execute(cmdObtemCateg);
+			if (categoria == null)
+			{
+				return NotFound("Categoria não encontrada");
+			}
+
+			var comando = new CadastraTarefa(model.Titulo, categoria, model.Prazo);
+			var handler = new CadastraTarefaHandler(_repositorioTarefas, _logger);
+			handler.Execute(comando);
+			return Ok();
+		}
+	}
 }
